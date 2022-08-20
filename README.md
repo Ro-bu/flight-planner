@@ -1,70 +1,52 @@
-# Getting Started with Create React App
+# react-flight-planner
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Solo project to create a space flight planner. I was given an app description, an API key, and possible routes between planets.
 
-## Available Scripts
+## Getting started
 
-In the project directory, you can run:
+```
+git clone https://github.com/Ro-bu/flight-planner.git
+cd flight-planner
+npm install
+npm start
+```
 
-### `npm start`
+## Objectives & Outcomes
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The main goal for this project was to create a flight planner app that fetches data and processes it to provide the user with a possible flight route between selected planets. There needed to be a filter possibility for the possible routes and a booking system.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The last 15 pricelists and all the bookings for those lists are stored in localStorage.
 
-### `npm test`
+Beyond that, other learning outcomes were:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- How to use react-select
+- Graphs and DFS
+- First time using data that needs this much processing
 
-### `npm run build`
+## Biggest hurdles
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+I had never used Graphs nor heard of DFS or BFS before, so finding all the possible routes was a challenge.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Creating possible flight patterns from the routes was also a challenge, as I had never used data before that needs that amount of processing before passed to components.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Possible improvements
 
-### `npm run eject`
+I created the minimum viable product based on the task description with a few added features but in order to make the app user friendly I suggest the following improvements:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- A button to switch from and to locations
+- Multichoice company filter
+- Ability to use other filters while the company filter is applied
+- Ascending and descending filters
+- A more compact mobile design
+- Styled select components
+- Pagination for search results
+- Control for duplicates in booked flights
+- Take bookings in a modal or another page
+- Edit/remove booked flights
+- Animation for moving parts
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Javascript Framework
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [React](https://github.com/facebook/create-react-app)
+- [nanoid](https://www.npmjs.com/package/nanoid)
+- [react-select](https://react-select.com/)

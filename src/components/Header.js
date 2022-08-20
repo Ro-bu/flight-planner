@@ -1,11 +1,11 @@
 import React from "react";
 
-function Header() {
+function Header(props) {
 
     return(
         <div className="header">
             <h1 className="header-title">COSMOS ODYSSEY</h1>
-            <button type="button" className="header-button">YOUR BOOKED FLIGHTS</button>
+            <button onClick={props.openBookedFlights} type="button" className="header-button">YOUR BOOKED FLIGHTS</button>
         </div>
     )
 }
