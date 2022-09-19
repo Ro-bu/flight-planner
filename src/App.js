@@ -7,17 +7,21 @@ import {getPossibleRoutes, possibleRoutes} from "./components/PathFinder";
 import Popup from "./components/Popup";
 import Storage from "./components/Storage";
 import BookedFlights from "./components/BookedFlights";
+import { useDispatch, useSelector } from "react-redux";
+import { applyShowFilter } from "./redux/slices/filterSlice";
 
 function App() {
   const [hasBeenSearched, setHasBeenSearched] = React.useState(false);
-  const [showFilter, setShowFilter] = React.useState(false)
   const [flightData, setFlightData] = React.useState();
   const [flightRoutes, setFlightRoutes] = React.useState([]);
   const [flightsToShow, setFlightsToShow] = React.useState([]);
-  const [filterActive, setFilterActive] = React.useState("none");
   const [popupType, setPopupType] = React.useState("")
   const [bookedFlightsOpen, setBookedFlightsOpen] = React.useState(false);
   const [bookedFlights, setBookedFlights] = React.useState([]);
+
+  const {showFilter, filterActive} = useSelector((state) => state.filter);
+
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     if(flightData){
@@ -26,7 +30,7 @@ function App() {
       let flightDistances = getFlightDistances()
       setFlightsToShow(sortFlightsAndRoutes(flightRoutes, flightsToFilter, flightDistances))
       if(window.innerWidth > 999) {
-        setShowFilter(true)
+        dispatch(applyShowFilter())
       }
     }
   }, [flightData])
@@ -34,14 +38,6 @@ function App() {
   React.useEffect(() => {
     setBookedFlights(Storage.getData())
   }, [])
-
-  function toggleFilter() {
-    setShowFilter(prev => !prev)
-  }
-
-  function applyFilter(filter) {
-    setFilterActive(filter);
-  }
 
   function getNamedRoutes(routes){
     let namedRoutes = []
@@ -197,7 +193,7 @@ function App() {
         setPopupType("")
       }, 5000)
       return;
-    } if (new Date(flightData.validUntil) < new Date) {
+    } if (new Date(flightData.validUntil) < new Date()) {
       setPopupType("expired")
       setTimeout(() => {
         setPopupType("")
@@ -265,14 +261,14 @@ function App() {
       <SearchBar search={search} possibleRoutes={possibleRoutes} />
       {hasBeenSearched &&
         <div className="filter-main">
-          {showFilter ? <Filter key={filterActive} applyFilter={applyFilter} flightsToShow={flightsToShow} toggleFilter={toggleFilter} /> :
-            <div className="filter-block bottom-border" onClick={toggleFilter}>
+          {showFilter ? <Filter key={filterActive} flightsToShow={flightsToShow} /> :
+            <div className="filter-block bottom-border" onClick={() => dispatch(applyShowFilter())}>
               <p className="filter-title">Filter</p>
             </div>}
         </div>
       }
       { flightsToShow.length>0 && 
-      <Flights bookFlight={bookFlight} key={filterActive} filter={filterActive} key={flightsToShow.length} flightsToShow={flightsToShow} />
+      <Flights bookFlight={bookFlight} filter={filterActive} key={flightsToShow.length} flightsToShow={flightsToShow} />
       }
     </div>
   );
