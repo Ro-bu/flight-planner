@@ -9,17 +9,19 @@ import Storage from "./components/Storage";
 import BookedFlights from "./components/BookedFlights";
 import { useDispatch, useSelector } from "react-redux";
 import { applyShowFilter } from "./redux/slices/filterSlice";
+import { setPopupType } from "./redux/slices/popupSlice";
 
 function App() {
   const [hasBeenSearched, setHasBeenSearched] = React.useState(false);
   const [flightData, setFlightData] = React.useState();
   const [flightRoutes, setFlightRoutes] = React.useState([]);
   const [flightsToShow, setFlightsToShow] = React.useState([]);
-  const [popupType, setPopupType] = React.useState("")
+  // const [popupType, setPopupType] = React.useState("")
   const [bookedFlightsOpen, setBookedFlightsOpen] = React.useState(false);
   const [bookedFlights, setBookedFlights] = React.useState([]);
 
   const {showFilter, filterActive} = useSelector((state) => state.filter);
+  const {popupType} = useSelector((state) => state.popup);
 
   const dispatch = useDispatch();
 
@@ -53,9 +55,9 @@ function App() {
 
   function search(planets) {
     if(planets.from === planets.to || planets.from === "" || planets.to === "") {
-      setPopupType("search")
+      dispatch(setPopupType("search"))
       setTimeout(() => {
-        setPopupType("")
+        (dispatch(setPopupType("")))
       }, 5000)
     } else {
       const IndexflightRoutes = getPossibleRoutes(planets.from, planets.to);
@@ -188,15 +190,15 @@ function App() {
   function bookFlight(firstName, lastName, flight) {
     let bookingData
     if(firstName === "" || lastName === "") {
-      setPopupType("booking")
+      dispatch(setPopupType("booking"))
       setTimeout(() => {
-        setPopupType("")
+        dispatch(setPopupType(""))
       }, 5000)
       return;
     } if (new Date(flightData.validUntil) < new Date()) {
-      setPopupType("expired")
+      dispatch(setPopupType("expired"))
       setTimeout(() => {
-        setPopupType("")
+        dispatch(setPopupType(""))
       }, 5000)
       return;
     } else {
@@ -209,9 +211,9 @@ function App() {
         time: flight.time
       }
       bookedFlightToStorage(bookingData)
-      setPopupType("booked")
+      dispatch(setPopupType("booked"))
       setTimeout(() => {
-        setPopupType("")
+        dispatch(setPopupType(""))
       }, 5000)
     }
     
@@ -245,7 +247,7 @@ function App() {
   return (
     <div className="main-container">
       {popupType !== "" &&
-        <Popup errorType={popupType} />
+        <Popup />
       }
       <Header openBookedFlights={openBookedFlights} />
       {bookedFlightsOpen &&
