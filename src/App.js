@@ -10,18 +10,19 @@ import BookedFlights from "./components/BookedFlights";
 import { useDispatch, useSelector } from "react-redux";
 import { applyShowFilter } from "./redux/slices/filterSlice";
 import { setPopupType } from "./redux/slices/popupSlice";
+import {setBookedFlights } from "./redux/slices/bookedSlice";
+
+
 
 function App() {
   const [hasBeenSearched, setHasBeenSearched] = React.useState(false);
   const [flightData, setFlightData] = React.useState();
   const [flightRoutes, setFlightRoutes] = React.useState([]);
   const [flightsToShow, setFlightsToShow] = React.useState([]);
-  // const [popupType, setPopupType] = React.useState("")
-  const [bookedFlightsOpen, setBookedFlightsOpen] = React.useState(false);
-  const [bookedFlights, setBookedFlights] = React.useState([]);
 
   const {showFilter, filterActive} = useSelector((state) => state.filter);
   const {popupType} = useSelector((state) => state.popup);
+  const {bookedFlightsOpen } = useSelector((state) => state.bookedFlights)
 
   const dispatch = useDispatch();
 
@@ -38,7 +39,7 @@ function App() {
   }, [flightData])
 
   React.useEffect(() => {
-    setBookedFlights(Storage.getData())
+    dispatch(setBookedFlights(Storage.getData()))
   }, [])
 
   function getNamedRoutes(routes){
@@ -233,28 +234,18 @@ function App() {
     }
     Storage.saveData(currentData)
     Storage.checkLength()
-    setBookedFlights(Storage.getData())
+    dispatch(setBookedFlights(Storage.getData()))
   }
 
-  function openBookedFlights() {
-    setBookedFlightsOpen(true)
-  }
-
-  function closeBookedFlights() {
-    setBookedFlightsOpen(false);
-  }
 
   return (
     <div className="main-container">
       {popupType !== "" &&
         <Popup />
       }
-      <Header openBookedFlights={openBookedFlights} />
+      <Header />
       {bookedFlightsOpen &&
-        <BookedFlights
-          bookedFlights={bookedFlights}
-          bookedFlightsOpen={bookedFlightsOpen}
-          closeBookedFlights={closeBookedFlights} />
+        <BookedFlights />
       }
       {!hasBeenSearched &&
       <h2 className="starting-title">
