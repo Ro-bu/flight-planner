@@ -19,6 +19,7 @@ function Popup() {
         } else if (popupType === "booked") {
             dispatch(setPopupText("Flight booked"))
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [popupType])
 
     return(

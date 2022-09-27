@@ -2,11 +2,13 @@ import {configureStore} from "@reduxjs/toolkit";
 import filterReducer from "./slices/filterSlice";
 import popupReducer from "./slices/popupSlice";
 import bookedFlightsReducer from "./slices/bookedSlice";
+import flightsReducer from "./slices/flightsSlice";
 
 export const store = configureStore({
     reducer: {
         filter: filterReducer,
         popup: popupReducer,
-        bookedFlights: bookedFlightsReducer
+        bookedFlights: bookedFlightsReducer,
+        flights: flightsReducer
     }
 })

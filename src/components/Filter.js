@@ -1,33 +1,34 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
-import { applyHideFilter, applyFilterActive } from "../redux/slices/filterSlice";
+import { applyHideFilter, applyFilterActive, setCompanies } from "../redux/slices/filterSlice";
 
 
-function Filter(props) {
+function Filter() {
 
-    const [companies, setCompanies] = React.useState([])
+    const {companies} = useSelector((state) => state.filter)
+    const {flightsToShow} = useSelector((state) => state.flights)
 
     const dispatch = useDispatch();
 
-    function getCompanies (flightCollection) {
-        let companyStrings = new Set()
-        flightCollection.forEach((collection) => {
-            collection.companies.forEach((company) => {
-                companyStrings.add(company)
-            })
-        })
-        let companyOptions = [];
-        companyStrings.forEach((company) => {
-            companyOptions.push({value: company, label: company})
-        })
-
-
-        setCompanies([...companyOptions])
-    }
     React.useEffect(() => {
-        getCompanies(props.flightsToShow)
-    }, [props.flightsToShow])
+        function getCompanies (flightCollection) {
+            let companyStrings = new Set()
+            flightCollection.forEach((collection) => {
+                collection.companies.forEach((company) => {
+                    companyStrings.add(company)
+                })
+            })
+            let companyOptions = [];
+            companyStrings.forEach((company) => {
+                companyOptions.push({value: company, label: company})
+            })
+            dispatch(setCompanies([...companyOptions]))
+        }
+
+        getCompanies(flightsToShow)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [flightsToShow])
 
 
     return (

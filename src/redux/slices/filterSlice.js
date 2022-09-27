@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     showFilter: false,
-    filterActive: "none"
+    filterActive: "none",
+    companies: []
 }
 
 const filterSlice = createSlice({
@@ -17,10 +18,13 @@ const filterSlice = createSlice({
         },
         applyFilterActive: (state, action) => {
             state.filterActive = action.payload;
+        },
+        setCompanies: (state, action) => {
+            state.companies = action.payload;
         }
     }
 })
 
 export default filterSlice.reducer;
 
-export const { applyShowFilter, applyHideFilter, applyFilterActive } = filterSlice.actions;
+export const { applyShowFilter, applyHideFilter, applyFilterActive, setCompanies } = filterSlice.actions;
