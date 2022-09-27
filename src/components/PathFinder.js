@@ -69,7 +69,7 @@ function printAllPaths(s,d)
     // vertices in the current path
 function printAllPathsUtil(u,d,isVisited,localPathList)
 {
-    if (u == (d)) {
+    if (u === (d)) {
         currentList.push([...localPathList])
         return localPathList;
         }

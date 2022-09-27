@@ -1,11 +1,16 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { openBookedFlights} from "../redux/slices/bookedSlice";
 
-function Header(props) {
+
+function Header() {
+    const dispatch = useDispatch();
+
 
     return(
         <div className="header">
             <h1 className="header-title">COSMOS ODYSSEY</h1>
-            <button onClick={props.openBookedFlights} type="button" className="header-button">YOUR BOOKED FLIGHTS</button>
+            <button onClick={() => dispatch(openBookedFlights())} type="button" className="header-button">YOUR BOOKED FLIGHTS</button>
         </div>
     )
 }

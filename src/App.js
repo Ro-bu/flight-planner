@@ -7,41 +7,36 @@ import {getPossibleRoutes, possibleRoutes} from "./components/PathFinder";
 import Popup from "./components/Popup";
 import Storage from "./components/Storage";
 import BookedFlights from "./components/BookedFlights";
+import { useDispatch, useSelector } from "react-redux";
+import { applyShowFilter } from "./redux/slices/filterSlice";
+import { setPopupType } from "./redux/slices/popupSlice";
+import {setBookedFlights } from "./redux/slices/bookedSlice";
+import {setHasBeenSearched, setFlightData, setFlightRoutes, setIsLoading, setFlightsToShow} from "./redux/slices/flightsSlice";
+
 
 function App() {
-  const [hasBeenSearched, setHasBeenSearched] = React.useState(false);
-  const [showFilter, setShowFilter] = React.useState(false)
-  const [flightData, setFlightData] = React.useState();
-  const [flightRoutes, setFlightRoutes] = React.useState([]);
-  const [flightsToShow, setFlightsToShow] = React.useState([]);
-  const [filterActive, setFilterActive] = React.useState("none");
-  const [popupType, setPopupType] = React.useState("")
-  const [bookedFlightsOpen, setBookedFlightsOpen] = React.useState(false);
-  const [bookedFlights, setBookedFlights] = React.useState([]);
+
+  const {hasBeenSearched, isLoading, flightData} = useSelector((state) => state.flights)
+  const {showFilter } = useSelector((state) => state.filter);
+  const {popupType} = useSelector((state) => state.popup);
+  const {bookedFlightsOpen } = useSelector((state) => state.bookedFlights)
+
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
-    if(flightData){
-      setHasBeenSearched(true)
-      let flightsToFilter = getSuitableFlights();
-      let flightDistances = getFlightDistances()
-      setFlightsToShow(sortFlightsAndRoutes(flightRoutes, flightsToFilter, flightDistances))
+    function checkShowFilter() {
       if(window.innerWidth > 999) {
-        setShowFilter(true)
+        dispatch(applyShowFilter())
       }
     }
-  }, [flightData])
+    window.addEventListener("resize", checkShowFilter)
+    return () => window.removeEventListener("resize", checkShowFilter)
+  })
 
   React.useEffect(() => {
-    setBookedFlights(Storage.getData())
+    dispatch(setBookedFlights(Storage.getData()))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  function toggleFilter() {
-    setShowFilter(prev => !prev)
-  }
-
-  function applyFilter(filter) {
-    setFilterActive(filter);
-  }
 
   function getNamedRoutes(routes){
     let namedRoutes = []
@@ -57,32 +52,37 @@ function App() {
 
   function search(planets) {
     if(planets.from === planets.to || planets.from === "" || planets.to === "") {
-      setPopupType("search")
+      dispatch(setPopupType("search"))
       setTimeout(() => {
-        setPopupType("")
+        (dispatch(setPopupType("")))
       }, 5000)
     } else {
       const IndexflightRoutes = getPossibleRoutes(planets.from, planets.to);
       const namedRoutes = getNamedRoutes(IndexflightRoutes);
-      setFlightRoutes(namedRoutes)
-      fetchData()
+      dispatch(setFlightRoutes(namedRoutes))
+      fetchAndRender(namedRoutes)
     }
   }
 
-  function fetchData() {
+  function fetchAndRender(routes) {
     fetch("api/v1.0/TravelPrices")
     .then(res => res.json())
     .then(data => {
-      setFlightData(data)
+      dispatch(setFlightData(data))
+      dispatch(setHasBeenSearched(true))
+      let flightsToFilter = getSuitableFlights(data, routes);
+      let flightDistances = getFlightDistances(data);
+      dispatch(setFlightsToShow(sortFlightsAndRoutes(routes, flightsToFilter, flightDistances)));
+      dispatch(setIsLoading(false))
     })
     .catch((error) => {
       console.log(error)
     })
   }
 
-  function getFlightDistances() {
+  function getFlightDistances(data) {
     let flightDistances = []
-    flightData.legs.forEach((leg) => {
+    data.legs.forEach((leg) => {
       let singleFlightDistance = {
         from: leg.routeInfo.from.name,
         to: leg.routeInfo.to.name,
@@ -94,16 +94,18 @@ function App() {
   }
 
   function getRouteDistance(route, flightDistances) {
-    let distance = 0;
+    let totalDistance = 0;
     for(let i = 0; i < route.length-1; i++) {
+      let singleFlightDistance = 0;
       flightDistances.forEach((flight) => {
         if(route[i] === flight.from && route[i+1] === flight.to) {
-          distance += flight.distance
+          singleFlightDistance += flight.distance
         }
       })
+      totalDistance += singleFlightDistance;
     }
-    return distance;
-  }
+    return totalDistance;
+  };
 
   function sortFlightsAndRoutes(routes, flights, flightDistances) {
     let sortedFlights = [];
@@ -147,25 +149,27 @@ function App() {
   function flightCollectionTotalTime(collection) {
     let time =new Date(collection[collection.length-1].flightEnd) - new Date(collection[0].flightStart)
     return time;
-  }
+  };
 
-  function getSuitableFlights() {
+  function getSuitableFlights(data, routes) {
     let flightsArray = []
-    flightRoutes.forEach((route) => {
+    routes.forEach((route) => {
       let currentArray = []
       for(let i = 0; i < route.length-1; i++){
         if(currentArray.length === 0) {
-          flightData.legs.forEach((leg) => {
+          let tempArray = [];
+          data.legs.forEach((leg) => {
             if(leg.routeInfo.from.name === route[i] && leg.routeInfo.to.name === route[i+1]){
               leg.providers.forEach((provider) => {
-                currentArray.push([provider]);
+                tempArray.push([provider]);
               })
             }
           })
+          currentArray = [...tempArray]
         } else {
           let tempArray = []
           currentArray.forEach((provider) => {
-            flightData.legs.forEach((leg) => {
+            data.legs.forEach((leg) => {
               if(leg.routeInfo.from.name === route[i] && leg.routeInfo.to.name === route[i+1]){
                 leg.providers.forEach((nextProvider) => {
                   let prevFlightEnd
@@ -189,18 +193,19 @@ function App() {
     })
     return flightsArray;
   }
+
   function bookFlight(firstName, lastName, flight) {
     let bookingData
     if(firstName === "" || lastName === "") {
-      setPopupType("booking")
+      dispatch(setPopupType("booking"))
       setTimeout(() => {
-        setPopupType("")
+        dispatch(setPopupType(""))
       }, 5000)
       return;
-    } if (new Date(flightData.validUntil) < new Date) {
-      setPopupType("expired")
+    } if (new Date(flightData.validUntil) < new Date()) {
+      dispatch(setPopupType("expired"))
       setTimeout(() => {
-        setPopupType("")
+        dispatch(setPopupType(""))
       }, 5000)
       return;
     } else {
@@ -213,9 +218,9 @@ function App() {
         time: flight.time
       }
       bookedFlightToStorage(bookingData)
-      setPopupType("booked")
+      dispatch(setPopupType("booked"))
       setTimeout(() => {
-        setPopupType("")
+        dispatch(setPopupType(""))
       }, 5000)
     }
     
@@ -235,44 +240,34 @@ function App() {
     }
     Storage.saveData(currentData)
     Storage.checkLength()
-    setBookedFlights(Storage.getData())
+    dispatch(setBookedFlights(Storage.getData()))
   }
 
-  function openBookedFlights() {
-    setBookedFlightsOpen(true)
-  }
-
-  function closeBookedFlights() {
-    setBookedFlightsOpen(false);
-  }
 
   return (
     <div className="main-container">
       {popupType !== "" &&
-        <Popup errorType={popupType} />
+        <Popup />
       }
-      <Header openBookedFlights={openBookedFlights} />
+      <Header />
       {bookedFlightsOpen &&
-        <BookedFlights
-          bookedFlights={bookedFlights}
-          bookedFlightsOpen={bookedFlightsOpen}
-          closeBookedFlights={closeBookedFlights} />
+        <BookedFlights />
       }
       {!hasBeenSearched &&
       <h2 className="starting-title">
         Choose your next flight
       </h2>}
-      <SearchBar search={search} possibleRoutes={possibleRoutes} />
+      <SearchBar search={search} />
       {hasBeenSearched &&
         <div className="filter-main">
-          {showFilter ? <Filter key={filterActive} applyFilter={applyFilter} flightsToShow={flightsToShow} toggleFilter={toggleFilter} /> :
-            <div className="filter-block bottom-border" onClick={toggleFilter}>
+          {showFilter ? <Filter /> :
+            <div className="filter-block bottom-border" onClick={() => dispatch(applyShowFilter())}>
               <p className="filter-title">Filter</p>
             </div>}
         </div>
       }
-      { flightsToShow.length>0 && 
-      <Flights bookFlight={bookFlight} key={filterActive} filter={filterActive} key={flightsToShow.length} flightsToShow={flightsToShow} />
+      { !isLoading && 
+      <Flights bookFlight={bookFlight} />
       }
     </div>
   );
