@@ -15,7 +15,7 @@ npm start
 
 The main goal for this project was to create a flight planner app that fetches data and processes it to provide the user with a possible flight route between selected planets. There needed to be a filter possibility for the possible routes and a booking system.
 
-The last 15 pricelists and all the bookings for those lists are stored in localStorage.
+The last 15 pricelists with bookings are stored in localStorage.
 
 Beyond that, other learning outcomes were:
 
@@ -45,8 +45,9 @@ I created the minimum viable product based on the task description with a few ad
 - Edit/remove booked flights
 - Animation for moving parts
 
-### Javascript Framework
+## Development
 
 - [React](https://github.com/facebook/create-react-app)
+- [Redux-Toolkit](https://redux-toolkit.js.org/)
 - [nanoid](https://www.npmjs.com/package/nanoid)
 - [react-select](https://react-select.com/)
