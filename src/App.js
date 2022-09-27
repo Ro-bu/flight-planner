@@ -26,20 +26,22 @@ function App() {
 
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    if(flightData){
-      setHasBeenSearched(true)
-      let flightsToFilter = getSuitableFlights();
-      let flightDistances = getFlightDistances()
-      setFlightsToShow(sortFlightsAndRoutes(flightRoutes, flightsToFilter, flightDistances))
-      if(window.innerWidth > 999) {
-        dispatch(applyShowFilter())
-      }
-    }
-  }, [flightData])
+  // // EBAVAJALIK HOOK
+  // React.useEffect(() => {
+  //   if(flightData){
+  //     setHasBeenSearched(true)
+  //     let flightsToFilter = getSuitableFlights();
+  //     let flightDistances = getFlightDistances()
+  //     setFlightsToShow(sortFlightsAndRoutes(flightRoutes, flightsToFilter, flightDistances))
+  //     if(window.innerWidth > 999) {
+  //       dispatch(applyShowFilter())
+  //     }
+  //   }
+  // }, [flightData])
 
   React.useEffect(() => {
     dispatch(setBookedFlights(Storage.getData()))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function getNamedRoutes(routes){
@@ -68,11 +70,25 @@ function App() {
     }
   }
 
+  // function fetchData() {
+  //   fetch("api/v1.0/TravelPrices")
+  //   .then(res => res.json())
+  //   .then(data => {
+  //     setFlightData(data)
+  //   })
+  //   .catch((error) => {
+  //     console.log(error)
+  //   })
+  // }
   function fetchData() {
     fetch("api/v1.0/TravelPrices")
     .then(res => res.json())
     .then(data => {
       setFlightData(data)
+      setHasBeenSearched(true);
+      let flightsToFilter = getSuitableFlights();
+      let flightDistances = getFlightDistances();
+      setFlightsToShow(sortFlightsAndRoutes(flightRoutes, flightsToFilter, flightDistances));
     })
     .catch((error) => {
       console.log(error)
@@ -93,16 +109,18 @@ function App() {
   }
 
   function getRouteDistance(route, flightDistances) {
-    let distance = 0;
+    let totalDistance = 0;
     for(let i = 0; i < route.length-1; i++) {
+      let singleFlightDistance = 0;
       flightDistances.forEach((flight) => {
         if(route[i] === flight.from && route[i+1] === flight.to) {
-          distance += flight.distance
+          singleFlightDistance += flight.distance
         }
       })
+      totalDistance += singleFlightDistance;
     }
-    return distance;
-  }
+    return totalDistance;
+  };
 
   function sortFlightsAndRoutes(routes, flights, flightDistances) {
     let sortedFlights = [];
@@ -146,7 +164,7 @@ function App() {
   function flightCollectionTotalTime(collection) {
     let time =new Date(collection[collection.length-1].flightEnd) - new Date(collection[0].flightStart)
     return time;
-  }
+  };
 
   function getSuitableFlights() {
     let flightsArray = []
@@ -154,13 +172,15 @@ function App() {
       let currentArray = []
       for(let i = 0; i < route.length-1; i++){
         if(currentArray.length === 0) {
+          let tempArray = [];
           flightData.legs.forEach((leg) => {
             if(leg.routeInfo.from.name === route[i] && leg.routeInfo.to.name === route[i+1]){
               leg.providers.forEach((provider) => {
-                currentArray.push([provider]);
+                tempArray.push([provider]);
               })
             }
           })
+          currentArray = [...tempArray]
         } else {
           let tempArray = []
           currentArray.forEach((provider) => {
@@ -251,7 +271,7 @@ function App() {
       <h2 className="starting-title">
         Choose your next flight
       </h2>}
-      <SearchBar search={search} possibleRoutes={possibleRoutes} />
+      <SearchBar search={search} />
       {hasBeenSearched &&
         <div className="filter-main">
           {showFilter ? <Filter key={filterActive} flightsToShow={flightsToShow} /> :
