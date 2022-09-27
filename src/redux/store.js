@@ -10,5 +10,9 @@ export const store = configureStore({
         popup: popupReducer,
         bookedFlights: bookedFlightsReducer,
         flights: flightsReducer
-    }
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        immutableCheck: { warnAfter: 128 },
+        serializableCheck: { warnAfter: 128 },
+      })
 })
