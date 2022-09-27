@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/flight-planner/static/css/main.0ebd9772.css",
+    "main.js": "/flight-planner/static/js/main.653fc10a.js",
+    "index.html": "/flight-planner/index.html",
+    "main.0ebd9772.css.map": "/flight-planner/static/css/main.0ebd9772.css.map",
+    "main.653fc10a.js.map": "/flight-planner/static/js/main.653fc10a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0ebd9772.css",
+    "static/js/main.653fc10a.js"
+  ]
+}
