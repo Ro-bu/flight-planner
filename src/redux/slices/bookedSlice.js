@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     bookedFLightsOpen: false,
-    bookedFlights: []
+    bookedFlights: [],
+    closingTime: false
 }
 
 const bookedSlice = createSlice({
@@ -14,13 +15,17 @@ const bookedSlice = createSlice({
         },
         openBookedFlights: (state) => {
             state.bookedFlightsOpen = true;
+            state.closingTime = false;
         },
         setBookedFlights: (state, action) => {
             state.bookedFlights = action.payload;
+        },
+        setClosingTime: (state) => {
+            state.closingTime = true;
         }
     }
 })
 
 export default bookedSlice.reducer;
 
-export const {closeBookedFlights, openBookedFlights, setBookedFlights} = bookedSlice.actions;
+export const {setClosingTime, closeBookedFlights, openBookedFlights, setBookedFlights} = bookedSlice.actions;

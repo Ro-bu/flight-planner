@@ -2,20 +2,33 @@ import React from "react";
 import BookedFlightCard from "./BookedFlightCard";
 import {nanoid} from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
-import { closeBookedFlights} from "../redux/slices/bookedSlice";
+import { closeBookedFlights, setClosingTime} from "../redux/slices/bookedSlice";
 
-function BookedFlights(props) {
+function BookedFlights() {
     const dispatch = useDispatch();
 
-    const {bookedFlights} = useSelector((state) => state.bookedFlights)
 
-    function getIndividualFlights(list) {
+    const {closingTime, bookedFlights} = useSelector((state) => state.bookedFlights)
+
+    function getIndividualFlights() {
         let flights = []
         bookedFlights.forEach((collection) =>{
             flights = [...flights, ...collection.bookings]
         })
         return flights;
     }
+
+    React.useEffect(() => {
+        function closeAfterDelay() {
+            setTimeout(() => {
+                dispatch(closeBookedFlights())
+            }, 500)
+        }
+
+        if(closingTime === true) {
+            closeAfterDelay();
+        }
+    }, [closingTime])
 
     let bookedFLightsToShow = getIndividualFlights(bookedFlights)
     let bookedFlightCard = bookedFLightsToShow.map((booking) => {
@@ -25,9 +38,9 @@ function BookedFlights(props) {
     })
 
     return (
-        <div className="booked-flights-outer-container">
-            <div className="booked-flights-inner-container booking-open">
-                <div className="close-booked-flights" onClick={() => dispatch(closeBookedFlights())}>
+        <div className="booked-flights-outer-container" onClick={() => dispatch(setClosingTime())} >
+            <div className={`booked-flights-inner-container ${closingTime ? "booking-closed" : "booking-open"}`} onClick={(e) => e.stopPropagation()}>
+                <div className="close-booked-flights" onClick={() => dispatch(setClosingTime())}>
                     X
                 </div>
                 {bookedFlightCard}
